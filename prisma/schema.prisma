@@ -15,24 +15,31 @@ datasource db {
     relationMode = "prisma"
 }
 
-//quiz
-//-QuizId
-//-UserId
-//
-//question
-//-QuizId
-//-QuestoinId
-//-questions[6]
-//
-//answer
-//-QuestionId
-//-QuizId
-//-AnswerInt
-
-model Example {
-    id        String   @id @default(cuid())
+model Quiz{
+    id String @id @default(cuid())
+    userID String
     createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    @@unique([id])
+}
+
+model Question{
+    id String @id @default(cuid())
+    quizId String
+    question1 String
+    question2 String
+    question3 String
+    question4 String
+    createdAt DateTime @default(now())
+    @@unique([id])
+}
+
+model Answer{
+    id String @id @default(cuid())
+    quizId String
+    questionId String
+    answerInt Int
+    createdAt DateTime @default(now())
+    @@unique([id])
 }
 
 // Necessary for Next auth
