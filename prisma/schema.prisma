@@ -6,40 +6,55 @@ generator client {
 }
 
 datasource db {
-    provider = "mysql"
+    provider     = "mysql"
     // NOTE: When using postgresql, mysql or sqlserver, uncomment the @db.Text annotations in model Account below
     // Further reading:
     // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
     // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
-    url      = env("DATABASE_URL")
+    url          = env("DATABASE_URL")
     relationMode = "prisma"
 }
 
-model Quiz{
-    id String @id @default(cuid())
-    userID String
-    createdAt DateTime @default(now())
+model Quiz {
+    id        String     @id @default(cuid())
+    userID    String
+    createdAt DateTime   @default(now())
+    Question  Question[]
+    Answer    Answer[]
+
     @@unique([id])
 }
 
-model Question{
-    id String @id @default(cuid())
-    quizId String
-    question1 String
-    question2 String
-    question3 String
-    question4 String
-    createdAt DateTime @default(now())
+model Question {
+    id           String   @id @default(cuid())
+    quizId       String
+    numQuestions Int
+    question1    String
+    question2    String
+    question3    String?
+    question4    String?
+    question5    String?
+    question6    String?
+    createdAt    DateTime @default(now())
+    quiz         Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+    Answer       Answer[]
+
     @@unique([id])
+    @@index([quizId])
 }
 
-model Answer{
-    id String @id @default(cuid())
-    quizId String
+model Answer {
+    id         String   @id @default(cuid())
+    quizId     String
     questionId String
-    answerInt Int
-    createdAt DateTime @default(now())
+    answerInt  Int
+    createdAt  DateTime @default(now())
+    quiz       Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+    question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
     @@unique([id])
+    @@index([quizId])
+    @@index([questionId])
 }
 
 // Necessary for Next auth
@@ -59,6 +74,7 @@ model Account {
     user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@unique([provider, providerAccountId])
+    @@index([userId])
 }
 
 model Session {
@@ -67,6 +83,8 @@ model Session {
     userId       String
     expires      DateTime
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
 }
 
 model User {
