@@ -1,7 +1,7 @@
 import { Menu, Transition } from "@headlessui/react";
 import { useSession, signOut } from "next-auth/react";
-import { useState, Fragment } from "react";
-import { AuthLogin } from "./AuthButtons";
+import { Fragment } from "react";
+import Image from "next/image";
 
 const AccountDropdown = () => {
   const { data: sessionData } = useSession();
@@ -16,7 +16,13 @@ const AccountDropdown = () => {
       <div className="relative">
         <Menu.Button className="">
           {profilePic && (
-            <img className="h-10 w-10 rounded-full" src={profilePic} />
+            <Image
+              alt="Profile image and dropdown button"
+              width={100}
+              height={100}
+              className="h-10 w-10 rounded-full"
+              src={profilePic}
+            />
           )}
         </Menu.Button>
         <Transition
@@ -67,7 +73,7 @@ const AccountDropdown = () => {
                 {({ active }) => (
                   <a
                     onClick={() => {
-                      signOut();
+                      void signOut();
                     }}
                     className={`${
                       active ? "bg-gray-100 text-gray-900" : "text-gray-700"
