@@ -4,9 +4,10 @@ import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
 
 import { api } from "../utils/api";
+import { AuthLogin } from "../components/AuthButtons";
 
 const Home: NextPage = () => {
-  const hello = api.example.hello.useQuery({ text: "from tRPC" });
+  const { data: sessionData } = useSession();
 
   return (
     <>
@@ -33,42 +34,13 @@ const Home: NextPage = () => {
         />
         <link rel="manifest" href="/site.webmanifest" />
       </Head>
-      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]">
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
-          <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
-            Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
-          </h1>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
-              href="https://create.t3.gg/en/usage/first-steps"
-              target="_blank"
-            >
-              <h3 className="text-2xl font-bold">First Steps →</h3>
-              <div className="text-lg">
-                Just the basics - Everything you need to know to set up your
-                database and authentication.
-              </div>
-            </Link>
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
-              href="https://create.t3.gg/en/introduction"
-              target="_blank"
-            >
-              <h3 className="text-2xl font-bold">Documentation →</h3>
-              <div className="text-lg">
-                Learn more about Create T3 App, the libraries it uses, and how
-                to deploy it.
-              </div>
-            </Link>
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-2xl text-white">
-              {hello.data ? hello.data.greeting : "Loading tRPC query..."}
-            </p>
-            <AuthShowcase />
-          </div>
+
+      <main className="">
+        <div className="flex min-h-screen flex-col items-center justify-center">
+          {!sessionData && <LoginPage />}
+          {sessionData && <LandingPage />}
         </div>
+        <AuthLogin />
       </main>
     </>
   );
@@ -81,14 +53,13 @@ const AuthShowcase: React.FC = () => {
 
   const { data: secretMessage } = api.example.getSecretMessage.useQuery(
     undefined, // no input
-    { enabled: sessionData?.user !== undefined },
+    { enabled: sessionData?.user !== undefined }
   );
 
   return (
     <div className="flex flex-col items-center justify-center gap-4">
       <p className="text-center text-2xl text-white">
         {sessionData && <span>Logged in as {sessionData.user?.name}</span>}
-        {secretMessage && <span> - {secretMessage}</span>}
       </p>
       <button
         className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
@@ -97,5 +68,37 @@ const AuthShowcase: React.FC = () => {
         {sessionData ? "Sign out" : "Sign in"}
       </button>
     </div>
+  );
+};
+
+const LoginPage = () => {
+  return (
+    <>
+      <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
+        <h1 className="text-2xl font-extrabold tracking-tight text-white sm:text-[5rem]">
+          Welcome to <span className="text-[hsl(280,100%,70%)]">Quest</span>
+        </h1>
+        <div className="flex flex-col items-center gap-2">
+          <p className="text-2xl text-white">
+            Please log in to create a{" "}
+            <span className="text-[hsl(280,100%,70%)]">quiz</span>
+          </p>
+          <AuthShowcase />
+          <p className="mt-20 text-2xl text-white">
+            or enter a quiz number below
+          </p>
+          <input />
+        </div>
+      </div>
+    </>
+  );
+};
+
+const LandingPage = () => {
+  return (
+    <>
+      <h1 className="text-white">Logged in</h1>
+      <AuthShowcase />
+    </>
   );
 };
